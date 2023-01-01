@@ -1,6 +1,9 @@
 import pygame
 import os
+pygame.font.init()
 
+
+healthfont = pygame.font.SysFont('comicsans', 40)
 WIDTH, HEIGHT = 900, 500
 
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -22,6 +25,7 @@ bullet_vel = 4
 ybullets =[]
 rbullets = []
 
+
 BORDER = pygame.Rect(WIDTH//2-5, 0, 10, 500)
 bg = pygame.image.load(os.path.join('Assets', 'space.png'))
 bgnew = pygame.transform.scale(bg, (900, 500))
@@ -29,13 +33,18 @@ spaceship1 = pygame.image.load(os.path.join('Assets', 'spaceship_yellow.png'))
 spaceship2 = pygame.image.load(os.path.join('Assets', 'spaceship_red.png'))
 resizeship1 = pygame.transform.rotate(pygame.transform.scale(spaceship1, (w1, h1)), 90)
 resizeship2 = pygame.transform.rotate(pygame.transform.scale(spaceship2, (w1, h1)), -90)
-def draw_window(red, yellow, redbullets, yellowbullets):
+def draw_window(red, yellow, redbullets, yellowbullets, r_health, y_health):
     WIN.fill(white)
     
     WIN.blit(bgnew, (0, 0))
+    rhealthtxt = healthfont.render("Health: "+ str(r_health), 1, white) 
+    yhealthtxt = healthfont.render("Health: "+ str(y_health), 1, white) 
+    WIN.blit(rhealthtxt, (WIDTH-rhealthtxt.get_width() -10, 10))
+    WIN.blit(yhealthtxt, (10, 10))
     pygame.draw.rect(WIN, white, BORDER)
     WIN.blit(resizeship1, (yellow.x, yellow.y))
     WIN.blit(resizeship2, (red.x, red.y))
+
 
     for bullets in redbullets:
         pygame.draw.rect(WIN, RED, bullets)
@@ -77,6 +86,8 @@ def bullets(ybullets, rbullets, yellow, red):
 
 
 def main():
+    yhealth = 10
+    rhealth = 10
     clock = pygame.time.Clock()
     run = True
     red = pygame.Rect(700, 100, w1, h1)
@@ -95,13 +106,30 @@ def main():
                     bullet = pygame.Rect(red.x, red.y+red.height//2-2, 10, 5)
                     rbullets.append(bullet)
 
+            if event.type == redhit:
+                rhealth-=1
+            if event.type == yellowhit:
+                yhealth-=1
+            winnertext = ""
+            if yhealth <= 0:
+                winnertext = "Red Wins"
+            if rhealth <= 0:
+                winnertext = "Yellow Wins"
+            if winnertext!="":
+                pass
+        
+
+
+            
+
+
 
         keys_pressed = pygame.key.get_pressed()
         yellowmov(keys_pressed, yellow)
         redmov(keys_pressed, red)
         bullets(ybullets, rbullets, yellow, red)
         
-        draw_window(red, yellow, rbullets, ybullets)
+        draw_window(red, yellow, rbullets, ybullets, rhealth, yhealth)
     pygame.quit
 
 if __name__ == "__main__":
